@@ -1,0 +1,48 @@
+issue: 
+author: bdbaddog <William Deegan>
+notes:
+---
+type: new
+description: >
+      Added blah blah and more blah
+      for good stuff
+issue: 1234
+---
+type: deprecated
+description: >
+      removed some old cruft
+issue: 3456
+---
+type: change
+description: >
+      changed foo to bar
+issue: 9999
+---
+type: enhancement
+description: >
+      made blobs better
+issue: 7654
+---
+type: fix
+descripton: >
+      fixed flux capacitor
+issue: N/A
+---
+type: improvement
+description: >
+      improved tast of bourbon
+issue: 0007
+---
+type: packaging
+description: >
+      packaging for timelords
+issue: 8888
+---
+type: docs | documentation
+description: >
+      Added info on using warp device
+issue: 77789
+---
+type: development | dev
+description:  added flake8 checking to GH actions
+    

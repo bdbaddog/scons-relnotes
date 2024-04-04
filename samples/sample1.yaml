@@ -1,6 +1,7 @@
-issue: 
-author: bdbaddog <William Deegan>
-notes:
+change:
+  issue: 
+  author: bdbaddog <William Deegan>
+  notes:
 ---
 type: new
 description: >
@@ -38,11 +39,11 @@ description: >
       packaging for timelords
 issue: 8888
 ---
-type: docs | documentation
+type: docs #| documentation
 description: >
       Added info on using warp device
 issue: 77789
 ---
-type: development | dev
+type: dev #| development #| dev
 description:  added flake8 checking to GH actions
     

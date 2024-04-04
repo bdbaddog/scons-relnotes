@@ -1,0 +1,32 @@
+If you are reading this in the git repository, the contents
+refer to *unreleased* changes since the last SCons release.
+Past official release announcements appear at:
+
+    https://scons.org/tag/releases.html
+
+==================================================================
+
+A new SCons release, {{ this_release }}, is now available on the SCons download page:
+
+    https://scons.org/pages/download.html
+
+
+Here is a summary of the changes since {{ prev_release }}:
+
+{% for type in CHANGE_TYPES %}
+{% if release_parts[type]|length > 0 %}
+{{ CHANGE_TYPES[type] }}
+{% for char in CHANGE_TYPES[type] %}-{% endfor %}
+
+{% for item in release_parts[type] %}
+- {{ item.description }}
+
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+Thanks to the following contributors listed below for their contributions to this release.
+==========================================================================================
+.. code-block:: text
+
+    {{ git_shortlog_content }}

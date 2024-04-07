@@ -8,12 +8,17 @@ NOTE: The 4.0.0 Release of SCons dropped Python 2.7 Support
 NOTE: 4.3.0 now requires Python 3.6.0 and above. Python 3.5.x is no longer supported
 
 RELEASE {{ this_release }} -  {{ datestamp }}
+
 {% for user in all_ordered_prs %}
   From {{ user }}:
-{%- for pr in all_ordered_prs[user] %}
-{%- if pr.notes %}- {{ pr.notes }}{% endif %}
-  {% for item in pr.items -%}
- - {{ item.description }} {% if item.issue %} (Fixes issue #{{ item.issue }}){% endif %}
-  {% endfor %}
-  {%- endfor %}
+{% for pr in all_ordered_prs[user] %}
+{% if pr.notes %}
+    - {{ pr.notes }}
+{% endif %}
+{% for item in pr.items %}
+    - {{ item.description }}{% if item.issue != -1 %}
+(Fixes issue #{{ item.issue }})
+{% endif -%}
+{% endfor %}
+{% endfor %}
 {% endfor %}

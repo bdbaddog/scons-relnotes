@@ -7,6 +7,7 @@ import os
 import sys
 import pprint
 import argparse
+import subprocess
 from pathlib import Path
 from jinja2 import Template, Environment, FileSystemLoader
 
@@ -117,7 +118,7 @@ def read_files(directory="samples"):
                 all_prs[pr_info.author] = [pr_info]
 
             for part in pr_info.items:
-                print(f"{part.type} -> {part.description}")
+                # print(f"{part.type} -> {part.description}")
                 release_parts[part.type].append(part)
 
 
@@ -125,10 +126,17 @@ def get_git_shortlog():
     """
     git shortlog --no-merges -ns 4.0.1..HEAD
     """
-    return """git shortlog --no-merges -ns 4.7.0..HEAD
-     7  Raymond Li
-     5  Mats Wichmann
-     2  William Deegan"""
+    # return f"""git shortlog --no-merges -ns {prev_release}..HEAD
+    #  7  Raymond Li
+    #  5  Mats Wichmann
+    #  2  William Deegan"""
+
+    command=["git","shortlog","--no-merges","-s",f"{prev_release}..HEAD"]
+    output=subprocess.check_output(args=command,
+                                   cwd='/Users/bdbaddog/devel/scons/git/as_scons',
+                                   universal_newlines=True)
+    return output," ".join(command)
+
 
 
 def render_release_notes():
@@ -136,15 +144,20 @@ def render_release_notes():
     env = Environment(
         trim_blocks=True, lstrip_blocks=True, loader=FileSystemLoader("templates")
     )
+
+    git_shortlog_content,git_command=get_git_shortlog()
+
     template = env.get_template("release.txt.jinja2")
     rendered_template = template.render(
         CHANGE_TYPES=CHANGE_TYPES,
         release_parts=release_parts,
         this_release=this_release,
         prev_release=prev_release,
-        git_shortlog_content=get_git_shortlog(),
+        git_shortlog_content=git_shortlog_content,
+        git_command=git_command,
     )
 
+    print("Writing RELEASE.txt")
     with open("RELEASE.txt", "w") as rn:
         print(
             rendered_template,
@@ -161,7 +174,7 @@ def split_and_sort_key(name):
     Returns:
         A tuple containing the last name (lowercased), the first name (lowercased), and the original name.
     """
-    print(f"Processing {name}")
+    # print(f"Processing {name}")
     first, last = name.lower().split()  # Lowercase for case-insensitive sorting
     return (last, first, name)  # Sort by last name, then first name, then original name
 
@@ -181,6 +194,7 @@ def render_changes():
         datestamp=get_datestring(),
     )
 
+    print("Writing CHANGES.txt")
     with open("CHANGES.txt", "w") as rn:
         print(
             rendered_template,
@@ -188,6 +202,8 @@ def render_changes():
         )
 
 def process_cmdline():
+    global prev_release, this_release
+
     parser = argparse.ArgumentParser(prog='scons-relnotes',
                                      description='Produce CHANGES.txt and RELEASE.txt for SCons')
     
@@ -203,14 +219,7 @@ def process_cmdline():
 if __name__ == "__main__":
     process_cmdline()
     read_files("samples")
-    print("done")
 
     render_release_notes()
     render_changes()
-
-    # for doc in dictionary:
-    #     print("New document:")
-    #     for key, value in doc.items():
-    #         print(key + " : " + str(value))
-    #         if type(value) is list:
-    #             print(str(len(value)))
+    print("done")

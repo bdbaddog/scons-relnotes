@@ -4,6 +4,7 @@ from enum import StrEnum
 import yaml
 import time
 import os
+import sys
 import pprint
 from pathlib import Path
 from jinja2 import Template, Environment, FileSystemLoader
@@ -73,8 +74,15 @@ def capitalize_first(info):
 
 
 class ChangeItem:
+    _LEGAL_KEYS = set(['type','issue','description'])
     def __init__(self, item_info) -> None:
         # TODO: Validated below
+        found_keys = set(item_info.keys())
+        bad_keys = found_keys - self._LEGAL_KEYS
+        if bad_keys:
+            print(f"ERROR: TYPO FOUND: {bad_keys}")
+            sys.exit(-1)
+
         self.type = item_info["type"].strip()
         self.issue = item_info.get("issue") or -1
         self.description = capitalize_first(item_info["description"])
@@ -89,7 +97,7 @@ class PRInfo:
         for i in info:
             if i.get("author"):
                 self.author = i["author"].strip()
-            elif i.get("description"):
+            else:
                 self.items.append(ChangeItem(i))
 
     def __str__(self) -> str:
@@ -108,6 +116,7 @@ def read_files(directory="samples"):
                 all_prs[pr_info.author] = [pr_info]
 
             for part in pr_info.items:
+                print(f"{part.type} -> {part.description}")
                 release_parts[part.type].append(part)
 
 

@@ -6,6 +6,7 @@ import time
 import os
 import sys
 import pprint
+import argparse
 from pathlib import Path
 from jinja2 import Template, Environment, FileSystemLoader
 
@@ -186,8 +187,21 @@ def render_changes():
             file=rn,
         )
 
+def process_cmdline():
+    parser = argparse.ArgumentParser(prog='scons-relnotes',
+                                     description='Produce CHANGES.txt and RELEASE.txt for SCons')
+    
+    parser.add_argument('--version', default='4.7.1', help='The version you are producing release/changes for')
+    parser.add_argument('--prev', default='4.7.0', help='The previous released version of the tool')
+    args = parser.parse_args()
+
+    prev_release = args.prev
+    this_release = args.version
+
+
 
 if __name__ == "__main__":
+    process_cmdline()
     read_files("samples")
     print("done")
 

@@ -2,6 +2,8 @@
 
 from enum import StrEnum
 import yaml
+import time
+import os
 import pprint
 from pathlib import Path
 from jinja2 import Template, Environment, FileSystemLoader
@@ -35,12 +37,49 @@ release_parts = {t: [] for t in CHANGE_TYPES}
 all_prs = dict()
 
 
+
+
+# From SCons site_init/BuildCommandLine.py
+def get_datestring():
+    """
+    Determine the release date and the pattern to match a date
+    Mon, 05 Jun 2010 21:17:15 -0700
+    NEW DATE WILL BE INSERTED HERE
+    """
+
+    min = (time.daylight and time.altzone or time.timezone) // 60
+    hr = min // 60
+    min = -(min % 60 + hr * 100)
+    # TODO: is it better to take the date of last rev? Externally:
+    #   SOURCE_DATE_EPOCH =`git log -1 --pretty=%ct`
+    date = (
+        time.strftime(
+            '%a, %d %b %Y %X',
+            time.localtime(int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))),
+        )
+        + ' %+.4d' % min
+    )
+
+    return date
+
+def capitalize_first(info):
+    """
+    Ensure that the first character of the description of this part of the PR is capitalized
+    """
+    if info is None:
+        return  ""
+    else:
+        info = info.strip()
+        return info[0].upper() + info[1:]
+
+
 class ChangeItem:
     def __init__(self, item_info) -> None:
         # TODO: Validated below
-        self.type = item_info.get("type")
-        self.issue = item_info.get("item")
-        self.description = item_info.get("description")
+        self.type = item_info["type"].strip()
+        self.issue = item_info.get("issue") or -1
+        self.description = capitalize_first(item_info["description"])
+        
 
     def __str__(self) -> str:
         return self.description
@@ -52,9 +91,9 @@ class PRInfo:
         for i in info:
             if i.get("change"):
                 change = i["change"]
-                self.author = change["author"]
-                self.issue = change.get("issue", False)
-                self.notes = change.get("notes", False)
+                self.author = change["author"].strip()
+                self.issue = change['issue']
+                self.notes = capitalize_first(change['notes'])
             elif i.get("description"):
                 self.items.append(ChangeItem(i))
 
@@ -132,6 +171,7 @@ def render_changes():
         all_ordered_prs=all_ordered_prs,
         this_release=this_release,
         prev_release=prev_release,
+        datestamp=get_datestring(),
     )
 
     with open("CHANGES.txt", "w") as rn:

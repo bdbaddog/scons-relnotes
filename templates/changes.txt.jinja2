@@ -12,13 +12,8 @@ RELEASE {{ this_release }} -  {{ datestamp }}
 {% for user in all_ordered_prs %}
   From {{ user }}:
 {% for pr in all_ordered_prs[user] %}
-{% if pr.notes %}
-    - {{ pr.notes }}
-{% endif %}
 {% for item in pr.items %}
-    - {{ item.description }}{% if item.issue != -1 %}
-(Fixes issue #{{ item.issue }})
-{% endif -%}
+    - {{ item.description }}{% if item.issue != -1 %} (Fixes issue #{{ item.issue }}){% endif +%}
 {% endfor %}
 {% endfor %}
 {% endfor %}

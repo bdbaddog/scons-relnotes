@@ -37,8 +37,6 @@ release_parts = {t: [] for t in CHANGE_TYPES}
 all_prs = dict()
 
 
-
-
 # From SCons site_init/BuildCommandLine.py
 def get_datestring():
     """
@@ -54,20 +52,21 @@ def get_datestring():
     #   SOURCE_DATE_EPOCH =`git log -1 --pretty=%ct`
     date = (
         time.strftime(
-            '%a, %d %b %Y %X',
-            time.localtime(int(os.environ.get('SOURCE_DATE_EPOCH', time.time()))),
+            "%a, %d %b %Y %X",
+            time.localtime(int(os.environ.get("SOURCE_DATE_EPOCH", time.time()))),
         )
-        + ' %+.4d' % min
+        + " %+.4d" % min
     )
 
     return date
+
 
 def capitalize_first(info):
     """
     Ensure that the first character of the description of this part of the PR is capitalized
     """
     if info is None:
-        return  ""
+        return ""
     else:
         info = info.strip()
         return info[0].upper() + info[1:]
@@ -79,7 +78,6 @@ class ChangeItem:
         self.type = item_info["type"].strip()
         self.issue = item_info.get("issue") or -1
         self.description = capitalize_first(item_info["description"])
-        
 
     def __str__(self) -> str:
         return self.description
@@ -89,11 +87,8 @@ class PRInfo:
     def __init__(self, info) -> None:
         self.items = []
         for i in info:
-            if i.get("change"):
-                change = i["change"]
-                self.author = change["author"].strip()
-                self.issue = change['issue']
-                self.notes = capitalize_first(change['notes'])
+            if i.get("author"):
+                self.author = i["author"].strip()
             elif i.get("description"):
                 self.items.append(ChangeItem(i))
 
@@ -128,7 +123,9 @@ def get_git_shortlog():
 
 def render_release_notes():
 
-    env = Environment(trim_blocks=True, loader=FileSystemLoader("templates"))
+    env = Environment(
+        trim_blocks=True, lstrip_blocks=True, loader=FileSystemLoader("templates")
+    )
     template = env.get_template("release.txt.jinja2")
     rendered_template = template.render(
         CHANGE_TYPES=CHANGE_TYPES,

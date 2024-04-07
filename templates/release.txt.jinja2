@@ -15,12 +15,12 @@ Here is a summary of the changes since {{ prev_release }}:
 
 {% for type in CHANGE_TYPES %}
 {% if release_parts[type]|length > 0 %}
+
 {{ CHANGE_TYPES[type] }}
 {% for char in CHANGE_TYPES[type] %}-{% endfor %}
 
 {% for item in release_parts[type] %}
 - {{ item.description }}
-
 {% endfor %}
 {% endif %}
 {% endfor %}
